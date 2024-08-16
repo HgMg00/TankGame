@@ -2,22 +2,25 @@ package src;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 /**
  * Game panel
  */
-public class MyPanel extends JPanel
+public class MyPanel extends JPanel implements KeyListener
 {
     MyTank myTank=null;
     public MyPanel(){
         myTank = new MyTank(100,100);
+        myTank.setSpeed(10);
     }
 
     @Override
     public void paint(Graphics g) {
         super.paint(g);
         g.fillRect(0,0,1000,750);
-        drawTank(myTank.getX(),myTank.getY(),g,3,0);
+        drawTank(myTank.getX(),myTank.getY(),g,myTank.getDirection(),0);
     }
 
     /**
@@ -71,6 +74,40 @@ public class MyPanel extends JPanel
                 break;
         }
 
+
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_W){
+            myTank.setDirection(0);
+            myTank.moveUp();
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_D){
+            myTank.setDirection(1);
+            myTank.moveRight();
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_S){
+            myTank.setDirection(2);
+            myTank.moveDown();
+        }
+
+        if (e.getKeyCode() == KeyEvent.VK_A){
+            myTank.setDirection(3);
+            myTank.moveLeft();
+        }
+        this.repaint();
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
 
     }
 }

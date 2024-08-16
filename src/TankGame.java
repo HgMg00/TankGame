@@ -16,5 +16,6 @@ public class TankGame extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(1000, 750);
         this.setVisible(true);
+        this.addKeyListener(myPanel);
     }
 }
