@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.Vector;
 
 /**
  * Game panel
@@ -11,9 +12,18 @@ import java.awt.event.KeyListener;
 public class MyPanel extends JPanel implements KeyListener
 {
     MyTank myTank=null;
+    Vector<EnemyTank> enemies=new Vector<>();
+    int enemyTankNumber=3;
+
+
     public MyPanel(){
         myTank = new MyTank(100,100);
-        myTank.setSpeed(10);
+
+        for (int i = 0; i < enemyTankNumber; i++) {
+            EnemyTank enemyTank = new EnemyTank(100 * (i + 1), 0);
+            enemyTank.setDirection(2);
+            enemies.add(enemyTank);
+        }
     }
 
     @Override
@@ -21,6 +31,10 @@ public class MyPanel extends JPanel implements KeyListener
         super.paint(g);
         g.fillRect(0,0,1000,750);
         drawTank(myTank.getX(),myTank.getY(),g,myTank.getDirection(),0);
+
+        for (EnemyTank enemyTank : enemies) {
+            drawTank(enemyTank.getX(), enemyTank.getY(), g, enemyTank.getDirection(), 1);
+        }
     }
 
     /**
@@ -37,7 +51,7 @@ public class MyPanel extends JPanel implements KeyListener
                 g.setColor(Color.green);
                 break;
             case 1:
-                g.setColor(Color.red);
+                g.setColor(Color.pink);
                 break;
         }
 
