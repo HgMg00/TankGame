@@ -11,6 +11,7 @@ public class TankGame extends JFrame {
 
     public TankGame() {
         myPanel = new MyPanel();
+        new Thread(myPanel).start();
         this.add(myPanel);
         this.setTitle("src.Tank Game");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
