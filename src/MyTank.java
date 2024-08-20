@@ -4,7 +4,7 @@ package src;
  * Class of MyTank
  */
 public class MyTank extends Tank {
-    private Shot shot = null;
+     Shot shot = null;
 
     public MyTank(int x, int y) {
         super(x, y);
@@ -27,10 +27,6 @@ public class MyTank extends Tank {
         }
 
         new Thread(shot).start();
-    }
-
-    public boolean shotOn (){
-        return shot != null && shot.visible;
     }
 
     public int getShotX() {
