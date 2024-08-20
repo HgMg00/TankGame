@@ -1,22 +1,16 @@
 package src;
 
-import java.util.Vector;
-
 /**
  * Class of MyTank
  */
 public class MyTank extends Tank {
-    Shot shot = null;
+     Shot shot = null;
 
-    Vector<Shot> shots=new Vector<>();
     public MyTank(int x, int y) {
         super(x, y);
     }
 
     public void shotToEnemy() {
-        if (shots.size()>=5)
-            return;
-
         switch (getDirection()) {
             case 0:
                 shot = new Shot(getX() + 20, getY(), getDirection());
@@ -31,14 +25,13 @@ public class MyTank extends Tank {
                 shot = new Shot(getX(), getY() + 20, getDirection());
                 break;
         }
-        shots.add(shot);
+
         new Thread(shot).start();
     }
 
     public int getShotX() {
         return shot.x;
     }
-
     public int getShotY() {
         return shot.y;
     }
