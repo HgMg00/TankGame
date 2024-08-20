@@ -27,7 +27,11 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
         for (int i = 0; i < enemyTankNumber; i++) {
             EnemyTank enemyTank = new EnemyTank(100 * (i + 1), 0);
             enemyTank.setDirection(2);
+<<<<<<< HEAD
 Shot shot = new Shot(enemyTank.getX() + 20, enemyTank.getY() + 60, enemyTank.getDirection());
+=======
+            Shot shot=new Shot(enemyTank.getX()+20, enemyTank.getY()+60, enemyTank.getDirection());
+>>>>>>> b00dcf9 (Using thread to make enemy tank fire bullets)
             enemyTank.shots.add(shot);
 
             new Thread(shot).start();
@@ -66,6 +70,7 @@ Shot shot = new Shot(enemyTank.getX() + 20, enemyTank.getY() + 60, enemyTank.get
 
 
         for (EnemyTank enemyTank : enemies) {
+<<<<<<< HEAD
             if (enemyTank.isLive) {
                 drawTank(enemyTank.getX(), enemyTank.getY(), g, enemyTank.getDirection(), 1);
                 for (int i = 0; i < enemyTank.shots.size(); i++) {
@@ -76,6 +81,16 @@ Shot shot = new Shot(enemyTank.getX() + 20, enemyTank.getY() + 60, enemyTank.get
                     } else {
                         enemyTank.shots.remove(shot);
                     }
+=======
+            drawTank(enemyTank.getX(), enemyTank.getY(), g, enemyTank.getDirection(), 1);
+            for (int i = 0; i < enemyTank.shots.size(); i++) {
+                Shot shot=enemyTank.shots.get(i);
+
+                if (shot.visible){
+                    g.draw3DRect(shot.x, shot.y, 1, 1, false);
+                }else {
+                    enemyTank.shots.remove(shot);
+>>>>>>> b00dcf9 (Using thread to make enemy tank fire bullets)
                 }
             }
         }
