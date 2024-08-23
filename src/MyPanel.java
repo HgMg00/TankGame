@@ -22,12 +22,14 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
     Image img3 = null;
 
     public MyPanel() {
-        myTank = new MyTank(100, 100);
+        myTank = new MyTank(500, 500);
 
         for (int i = 0; i < enemyTankNumber; i++) {
             EnemyTank enemyTank = new EnemyTank(100 * (i + 1), 0);
             enemyTank.setDirection(2);
-Shot shot = new Shot(enemyTank.getX() + 20, enemyTank.getY() + 60, enemyTank.getDirection());
+            new Thread(enemyTank).start();
+
+            Shot shot = new Shot(enemyTank.getX() + 20, enemyTank.getY() + 60, enemyTank.getDirection());
             enemyTank.shots.add(shot);
 
             new Thread(shot).start();
@@ -44,10 +46,15 @@ Shot shot = new Shot(enemyTank.getX() + 20, enemyTank.getY() + 60, enemyTank.get
     public void paint(Graphics g) {
         super.paint(g);
         g.fillRect(0, 0, 1000, 750);
-        drawTank(myTank.getX(), myTank.getY(), g, myTank.getDirection(), 0);
+        if (myTank != null && myTank.isLive)
+            drawTank(myTank.getX(), myTank.getY(), g, myTank.getDirection(), 0);
 
-        if (myTank.shot != null && myTank.shot.visible) {
-            g.draw3DRect(myTank.getShotX(), myTank.getShotY(), 1, 1, false);
+        for (int i = 0; i < myTank.shots.size(); i++) {
+            Shot shot = myTank.shots.get(i);
+            if (shot != null && shot.visible)
+                g.draw3DRect(shot.x, shot.y, 1, 1, false);
+            else
+                myTank.shots.remove(shot);
         }
 
         for (Bomb bomb : bombs) {
@@ -77,7 +84,8 @@ Shot shot = new Shot(enemyTank.getX() + 20, enemyTank.getY() + 60, enemyTank.get
                         enemyTank.shots.remove(shot);
                     }
                 }
-            }
+            } else
+                enemies.remove(enemyTank);
         }
     }
 
@@ -134,8 +142,34 @@ Shot shot = new Shot(enemyTank.getX() + 20, enemyTank.getY() + 60, enemyTank.get
 
     }
 
+    public void hitMyTank(){
+        for (int i=0; i<enemies.size();i++){
+            EnemyTank enemyTank=enemies.get(i);
+            for (int j = 0; j < enemyTank.shots.size(); j++) {
+                Shot shot= enemyTank.shots.get(j);
+                if (myTank.isLive && shot.visible)  {
+                    hitTank(shot,myTank);
+                }
+            }
+        }
+    }
+
+    public void hitEnemyTank() {
+        for (int i = 0; i < myTank.shots.size(); i++) {
+            Shot shot = myTank.shots.get(i);
+
+            //Determine the bullet to hit the enemy tank.
+            if (shot != null && shot.visible) {
+                for (EnemyTank enemyTank : enemies) {
+                    hitTank(shot, enemyTank);
+
+                }
+            }
+        }
+    }
+
     //The bullet to hit the enemy tank.
-    public void hitTank(Shot s, EnemyTank enemyTank) {
+    public void hitTank(Shot s, Tank enemyTank) {
         switch (enemyTank.getDirection()) {
             case 0:
             case 2:
@@ -169,25 +203,30 @@ Shot shot = new Shot(enemyTank.getX() + 20, enemyTank.getY() + 60, enemyTank.get
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_W) {
             myTank.setDirection(0);
-            myTank.moveUp();
+            if (myTank.getY() > 0)
+                myTank.moveUp();
         }
 
         if (e.getKeyCode() == KeyEvent.VK_D) {
             myTank.setDirection(1);
-            myTank.moveRight();
+            if (myTank.getX() + 60 < 1000)
+                myTank.moveRight();
         }
 
         if (e.getKeyCode() == KeyEvent.VK_S) {
             myTank.setDirection(2);
-            myTank.moveDown();
+            if (myTank.getY() + 60 < 750)
+                myTank.moveDown();
         }
 
         if (e.getKeyCode() == KeyEvent.VK_A) {
             myTank.setDirection(3);
-            myTank.moveLeft();
+            if (myTank.getX() > 0)
+                myTank.moveLeft();
         }
 
         if (e.getKeyCode() == KeyEvent.VK_J) {
+
             myTank.shotToEnemy();
         }
         this.repaint();
@@ -207,13 +246,8 @@ Shot shot = new Shot(enemyTank.getX() + 20, enemyTank.getY() + 60, enemyTank.get
                 throw new RuntimeException(e);
             }
 
-            //Determine the bullet to hit the enemy tank.
-            if (myTank.shot != null && myTank.shot.visible) {
-                for (EnemyTank enemyTank : enemies) {
-                    hitTank(myTank.shot, enemyTank);
-                }
-            }
-
+            hitEnemyTank();
+            hitMyTank();
             this.repaint();
         }
     }
