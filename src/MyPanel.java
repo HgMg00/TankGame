@@ -12,14 +12,8 @@ import java.util.Vector;
 public class MyPanel extends JPanel implements KeyListener, Runnable {
     MyTank myTank = null;
     Vector<EnemyTank> enemies = new Vector<>();
-
-    Vector<Bomb> bombs = new Vector<>();
-
     int enemyTankNumber = 3;
 
-    Image img1 = null;
-    Image img2 = null;
-    Image img3 = null;
 
     public MyPanel() {
         myTank = new MyTank(100, 100);
@@ -27,17 +21,8 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
         for (int i = 0; i < enemyTankNumber; i++) {
             EnemyTank enemyTank = new EnemyTank(100 * (i + 1), 0);
             enemyTank.setDirection(2);
-            Shot shot = new Shot(enemyTank.getX() + 20, enemyTank.getY() + 60, enemyTank.getDirection());
-            enemyTank.shots.add(shot);
-
-            new Thread(shot).start();
             enemies.add(enemyTank);
         }
-
-        img1 = Toolkit.getDefaultToolkit().getImage("src/imgBomb/bomb_1.gif");
-        img2 = Toolkit.getDefaultToolkit().getImage("src/imgBomb/bomb_2.gif");
-        img3 = Toolkit.getDefaultToolkit().getImage("src/imgBomb/bomb_3.gif");
-
     }
 
     @Override
@@ -46,38 +31,12 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
         g.fillRect(0, 0, 1000, 750);
         drawTank(myTank.getX(), myTank.getY(), g, myTank.getDirection(), 0);
 
-        if (myTank.shot != null && myTank.shot.visible) {
+        if (myTank.shotOn()) {
             g.draw3DRect(myTank.getShotX(), myTank.getShotY(), 1, 1, false);
         }
 
-        for (Bomb bomb : bombs) {
-            if (bomb.life > 6) {
-                g.drawImage(img1, bomb.x, bomb.y, 60, 60, this);
-            } else if (bomb.life > 3) {
-                g.drawImage(img2, bomb.x, bomb.y, 60, 60, this);
-            } else
-                g.drawImage(img3, bomb.x, bomb.y, 60, 60, this);
-
-            bomb.lifeDown();
-            if (bomb.life == 0) {
-                bombs.remove(bomb);
-            }
-        }
-
-
         for (EnemyTank enemyTank : enemies) {
-            if (enemyTank.isLive) {
-                drawTank(enemyTank.getX(), enemyTank.getY(), g, enemyTank.getDirection(), 1);
-                for (int i = 0; i < enemyTank.shots.size(); i++) {
-                    Shot shot = enemyTank.shots.get(i);
-
-                    if (shot.visible) {
-                        g.draw3DRect(shot.x, shot.y, 1, 1, false);
-                    } else {
-                        enemyTank.shots.remove(shot);
-                    }
-                }
-            }
+            drawTank(enemyTank.getX(), enemyTank.getY(), g, enemyTank.getDirection(), 1);
         }
     }
 
@@ -134,32 +93,6 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
 
     }
 
-    //The bullet to hit the enemy tank.
-    public void hitTank(Shot s, EnemyTank enemyTank) {
-        switch (enemyTank.getDirection()) {
-            case 0:
-            case 2:
-                if (s.x > enemyTank.getX() && s.x < enemyTank.getX() + 40
-                        && s.y > enemyTank.getY() && s.y < enemyTank.getY() + 60) {
-                    s.visible = false;
-                    enemyTank.isLive = false;
-                    Bomb bomb = new Bomb(enemyTank.getX(), enemyTank.getY());
-                    bombs.add(bomb);
-                }
-                break;
-            case 1:
-            case 3:
-                if (s.x > enemyTank.getX() && s.x < enemyTank.getX() + 60 &&
-                        s.y > enemyTank.getY() && s.y < enemyTank.getY() + 40) {
-                    s.visible = false;
-                    enemyTank.isLive = false;
-                    Bomb bomb = new Bomb(enemyTank.getX(), enemyTank.getY());
-                    bombs.add(bomb);
-                }
-                break;
-        }
-    }
-
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -206,14 +139,6 @@ public class MyPanel extends JPanel implements KeyListener, Runnable {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-
-            //Determine the bullet to hit the enemy tank.
-            if (myTank.shot != null && myTank.shot.visible) {
-                for (EnemyTank enemyTank : enemies) {
-                    hitTank(myTank.shot, enemyTank);
-                }
-            }
-
             this.repaint();
         }
     }
